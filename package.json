@@ -1,0 +1,26 @@
+{
+  "name": "wisdom-of-the-ages",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "serve": "npx http-server",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "rpg",
+    "ultima",
+    "pixel",
+    "game",
+    "retro",
+    "survival",
+    "HTML5",
+    "JavaScript"
+  ],
+  "author": "Luke Nickerson",
+  "license": "MIT",
+  "dependencies": {
+    "http-server": "^14.1.1"
+  }
+}
