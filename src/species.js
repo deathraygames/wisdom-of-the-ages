@@ -1,3 +1,5 @@
+import { randInt, vec2 } from './little-engine-esm/little-engine-esm-build.all.js';
+
 const size = 24;
 const ri = randInt;
 const MUTANT_CHANCE = 20; // 1 out of 20
@@ -92,7 +94,7 @@ function getLegPoints(x, y, kneeY, legWidth, kneeBend, kneeWidth, lift) {
 	];
 }
 
-function drawSpecies(ctx, pos, species, direction = 4, t = 0) {
+function drawSpecies(ctx, drawCanvas2D, pos, species, direction = 4, t = 0) {
 	// const { x, y } = worldToScreen(pos);
 	const {
 		baseColor, backColor, forwardColor, eyeColor,

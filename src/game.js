@@ -1,6 +1,24 @@
+// import { setupWorld } from './world.js';
 import { World } from './world.js';
 import { loadTileImageSource } from './tiles.js';
+import { setupSounds } from './sounds.js';
 import { achievements } from './achievements.js';
+import * as engine from './little-engine-esm/little-engine-esm-build.all.js';
+// import { setupEntities } from './entities.js';
+
+const {
+    vec2, clamp, FontImage, Color,
+    setCameraPos, setCameraScale, setGravity,
+    keyWasReleased,
+    drawTextScreen, getOverlayCanvas, getCameraScale, getCameraPos,
+    screenToWorld, getMouseWheel, drawRectScreenSpace,
+    getTileCollisionSize,
+} = engine;
+setupSounds(engine);
+window.engine = engine;
+
+// const entities = setupEntities(engine);
+// const { World } = setupWorld(engine, entities);
 
 // popup errors if there are any (help diagnose issues on mobile devices)
 //onerror = (...parameters)=> alert(parameters);
@@ -26,11 +44,11 @@ function gameInit()
     font = new FontImage;
 
     // move camera to center of collision
-    cameraPos = tileCollisionSize.scale(.5);
-    cameraScale = 42;
+    setCameraPos(getTileCollisionSize().scale(.5));
+    setCameraScale(42);
 
     // enable gravity
-    gravity = 0; // -.01;
+    setGravity(0); // -.01;
 
     // create particle emitter
     // const emPos = vec2(10, 12);
@@ -92,7 +110,7 @@ function gameUpdate()
     }
     if (pc) {
         win.achievements = achievements;
-        cameraPos =  cameraPos.lerp(pc.pos, 0.1);
+        setCameraPos(getCameraPos().lerp(pc.pos, 0.1));
         // cameraPos =  cameraPos.lerp(w.spirits[0].pos, 0.1);
         if (pc.isDead()) gameState = 2;
         else {
@@ -110,7 +128,7 @@ function gameUpdate()
         // particleEmiter.pos = pc.pos;
     // }as
 
-    cameraScale = clamp(cameraScale*(1-mouseWheel/10), 3, 700);
+    setCameraScale(clamp(getCameraScale()*(1 - getMouseWheel()/10), 3, 700));
     
     if (w) w.update();
 }
@@ -130,6 +148,8 @@ function gameRender()
 
 ///////////////////////////////////////////////////////////////////////////////
 function renderInventory(pc) {
+    const overlayCanvas = getOverlayCanvas();
+    const cameraScale = getCameraScale();
     const midX = overlayCanvas.width/2;
     // const invText = pc.inventory
     //     .map((item) => item ? (item.name || ' ') + ' x' + item.quantity : ' ')
@@ -150,7 +170,7 @@ function renderInventory(pc) {
             overlayCanvas.height - 100,
         );
         const itemIndex = i % 10;
-        const color = (itemIndex === pc.equipIndex) ? new Color(.9,.9,.9,.3) : new Color(.1,.1,.1,.3);
+        const color = (itemIndex === pc.equipIndex) ? new Color(.9,.9,.9,.3) : new Color(0,0,0,.4);
         drawRectScreenSpace(pos, size, color);
         const item = pc.inventory[itemIndex];
         if (item) {
@@ -163,6 +183,8 @@ function renderInventory(pc) {
 
 function gameRenderPost()
 {
+    const overlayCanvas = engine.getOverlayCanvas();
+    const cameraPos = engine.getCameraPos();
     const { pc } = w;
     const d = drawTextScreen;
     const white = new Color;
@@ -173,9 +195,7 @@ function gameRenderPost()
     const pxFontSize = overlayCanvas.width / 8000;
     // const r = (n) => Math.round(pc.pos[n] * 10) / 10;
     // d(`x ${r('x')}, y ${r('y')}`, vec2(midX, 80), 20, new Color, 9);
-    
 
-    
     if (gameState === 2) {
         d('YOU DIED', vec2(midX, midY - 90), 90, new Color(1, 0, 0), 4);
         d('Press Enter to restart', vec2(midX, midY), 40, new Color(1, .5, .5), 4);
@@ -188,7 +208,6 @@ function gameRenderPost()
         font.drawText('Press Enter to start', cameraPos.add(vec2(0, .4)), pxFontSize / 2, 1);
     } else if (gameState === 1 || gameState === 3 && pc) {
         renderInventory(pc);
-
         achievements.forEach((a, i) => 
             d(
                 `[${a[1] ? 'X' : ' '}] ` + a[0],
@@ -213,12 +232,10 @@ function gameRenderPost()
     }
 }
 
-
-
 ///////////////////////////////////////////////////////////////////////////////
 // Startup LittleJS Engine
 (async () => {
-    tileSizeDefault = vec2(TILE_SIZE);
+    engine.setTileSizeDefault(vec2(TILE_SIZE));
     const tis = await loadTileImageSource();
-    engineInit(gameInit, gameUpdate, gameUpdatePost, gameRender, gameRenderPost, tis);
+    engine.engineInit(gameInit, gameUpdate, gameUpdatePost, gameRender, gameRenderPost, tis);
 })();

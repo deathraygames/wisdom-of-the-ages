@@ -1,8 +1,9 @@
 let sounds;
-const setSounds = () => {
-    if (!Sound) throw new Error('no Sound');
+
+const setupSounds = (engine) => {
+    if (!engine || !engine.Sound) throw new Error('no engine Sound');
     if (sounds) return; // already set
-    const s = (a) => new Sound(a);
+    const s = (a) => new engine.Sound(a);
     sounds = {
         // for some reason, the property names were getting uglified so they need quotes
         'hit': s([,,183,.03,.02,.09,,1.49,-1.8,,,,-0.01,1.8,-1,.1,,.36,.08,.25]),
@@ -17,10 +18,9 @@ const setSounds = () => {
 };
 
 const playSound = (name, pos) => {
-    setSounds();
     if (!sounds) throw new Error('no sounds');
     if (!sounds[name]) { console.warn('No sound', name, 'in', sounds); return; }
     sounds[name].play(pos);
 };
 
-export { setSounds, playSound };
+export { setupSounds, playSound };

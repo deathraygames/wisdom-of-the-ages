@@ -1,8 +1,30 @@
+import {
+    Color, isOverlapping, vec2, randInt, rand, PI, mod, max, percent,
+    ASSERT,
+    Timer,
+    EngineObject, ParticleEmitter, drawRect,
+    getMainContext, drawCanvas2D,
+    // controls
+    mouseIsDown, getMousePos,
+    keyWasPressed, keyIsDown, gamepadIsDown, getUsingGamepad,
+} from './little-engine-esm/little-engine-esm-build.all.js';
 import { playSound } from './sounds.js';
 import { achievements } from './achievements.js';
 import { getSpecies, drawSpecies, breedSpecies } from './species.js';
 
 const nc = (...a) => new Color(...a);
+
+// function setupEntities(engine) {
+
+// const {
+//     ASSERT,
+//     Timer,
+//     EngineObject, ParticleEmitter, drawRect,
+//     getMainContext, drawCanvas2D, mouseIsDown, getMousePos,
+//     keyWasPressed, keyIsDown, gamepadIsDown, getUsingGamepad,
+// } = engine;
+
+// setupSounds(engine);
 
 /** A WorldEntity is a generic "thing" that exists in the world */
 class WorldEntity extends EngineObject {
@@ -577,7 +599,7 @@ class CharacterEntity extends WorldEntity {
             drawRect(bodyPos.add(vec2(0, -this.size.y * .75)), vec2(this.size.x * ca[0], ca[1]), nc(0,0,0, .1), this.angle)
         );
         // drawRect(bodyPos.add(vec2(0, -this.size.y * .75)), vec2(this.size.x * .9, .1), nc(0,0,0, .1), this.angle);
-        drawSpecies(mainContext, bodyPos, this.species, this.direction, this.walkTick);
+        drawSpecies(getMainContext(), drawCanvas2D, bodyPos, this.species, this.direction, this.walkTick);
         // drawRect(bodyPos, this.size.scale(this.drawScale), nc(.3, .3, .3, .4), this.angle);
         
         return;
@@ -621,6 +643,7 @@ class PlayerCharacterEntity extends CharacterEntity {
     }
 
     update() { // from platformer Player extends Character
+        const mousePos = getMousePos();
         if (mouseIsDown(2)) this.goTo(mousePos, true); // right click movement
 
         const numKeyCodes = [48, 49, 50, 51, 52, 53, 54, 55, 56, 57];
@@ -632,7 +655,7 @@ class PlayerCharacterEntity extends CharacterEntity {
         if (keyIsDown(69) || keyIsDown(88) || mouseIsDown(0) || gamepadIsDown(0)) this.action(mousePos);
 
         // movement control
-        this.moveInput = isUsingGamepad ? gamepadStick(0) : 
+        this.moveInput = getUsingGamepad() ? gamepadStick(0) : 
             vec2(keyIsDown(39) - keyIsDown(37), keyIsDown(38) - keyIsDown(40));
 
         if (this.moveInput && this.moveInput.x || this.moveInput.y) {
@@ -770,4 +793,9 @@ class SpiritEntity extends WorldEntity {
     }
 }
 
+// return { PlayerCharacterEntity, CharacterEntity, AnimalEntity, ItemEntity, SpiritEntity };
+
+// };
+
+// export { setupEntities };
 export { PlayerCharacterEntity, CharacterEntity, AnimalEntity, ItemEntity, SpiritEntity };

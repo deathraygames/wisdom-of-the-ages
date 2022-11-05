@@ -1,3 +1,5 @@
+import { randInt, styleCanvas, tileImage } from './little-engine-esm/little-engine-esm-build.all.js';
+
 const TILE_SIZE = window.TILE_SIZE || 16;
 let ctx;
 let tileCount = 0;
