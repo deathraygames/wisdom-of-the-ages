@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "serve": "npx http-server",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build:little-engine-esm": "node --experimental-modules ./src/little-engine-esm/little-builder.js"
   },
   "keywords": [
     "rpg",
@@ -21,6 +22,7 @@
   "author": "Luke Nickerson",
   "license": "MIT",
   "dependencies": {
-    "http-server": "^14.1.1"
+    "http-server": "^14.1.1",
+    "littlejsengine": "^1.4.0"
   }
 }
