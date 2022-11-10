@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "serve": "npx http-server",
+    "lint": "eslint ./",
     "test": "echo \"Error: no test specified\" && exit 1",
     "build:little-engine-esm": "node --experimental-modules ./src/little-engine-esm/little-builder.js"
   },
@@ -24,5 +25,10 @@
   "dependencies": {
     "http-server": "^14.1.1",
     "littlejsengine": "^1.4.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.27.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.26.0"
   }
 }
