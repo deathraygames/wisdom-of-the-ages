@@ -1,5 +1,6 @@
-import { randInt, styleCanvas, tileImage } from './little-engine-esm/little-engine-esm-build.all.js';
+import { randInt, styleCanvas, tileImage, Color, drawTextScreen } from './little-engine-esm/little-engine-esm-build.all.js';
 
+const MAX_TILES = 50;
 const TILE_SIZE = window.TILE_SIZE || 16;
 let ctx;
 let tileCount = 0;
@@ -11,6 +12,7 @@ function getTileX() {
 
 const rect = (r, g, b, x, y, q = TILE_SIZE, w = TILE_SIZE) => {
 	ctx.fillStyle = `#${r}${g}${b}`;
+	// (new Color(r, g, b)).toString();
 	ctx.fillRect(x, y, q, w);
 };
 
@@ -18,7 +20,7 @@ function drawTerrain(r, g, b) {
 	const x = getTileX();
 	const y = 0;
 	rect(r, g, b, x, y);
-	[6, 5, 4, 3, 3, 2, 2, 2, 1, 1, 1, 1, 1].forEach((n) => {
+	[3, 3, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1].forEach((n) => {
 		rect(
 			ri(r, 3),
 			ri(g, 3),
@@ -32,12 +34,26 @@ function drawTerrain(r, g, b) {
 	return x;
 }
 
+function drawTree(r = 0, g = 0, b = 0) {
+	const x = drawTerrain(r, g, b);
+	const y = 0;
+	[10, 6, 3, 3, 3, 2, 2].forEach((n) => rect(
+		ri(0, 4),
+		ri(8, 9),
+		ri(0, 4),
+		x + ri(TILE_SIZE - n),
+		y + ri(TILE_SIZE - n),
+		n,
+		n,
+	));
+}
+
 function drawRockyTerrain(r, g, b) {
 	const x = drawTerrain(r, g, b);
 	const y = 0;
-	[14, 10, 6, 3, 3, 3, 2, 2].forEach((n) => rect(
-		ri(7, 9),
-		ri(7, 9),
+	[10, 6, 3, 3, 3, 2, 2].forEach((n) => rect(
+		ri(6, 9),
+		ri(6, 9),
 		'a',
 		x + ri(TILE_SIZE - n),
 		y + ri(TILE_SIZE - n),
@@ -63,7 +79,7 @@ function drawStoneWall() {
 
 function drawTiles(doc) {
 	const canvas = doc.createElement('canvas');
-	canvas.width = 30 * TILE_SIZE;
+	canvas.width = MAX_TILES * TILE_SIZE;
 	canvas.height = 2 * TILE_SIZE;
 	// doc.body.appendChild(canvas);
 	ctx = canvas.getContext('2d');
@@ -75,7 +91,7 @@ function drawTiles(doc) {
 	drawTerrain(0, 0, 0); // 1
 	drawTerrain(1, 1, 1); // 2
 	drawTerrain(0, 1, 0); // 3
-	drawTerrain(1, 2, 0); // 4
+	drawTerrain(1, 1, 0); // 4
 	ctx.fillStyle = '#fff';
 	ctx.font = '14px serif';
 	[ // Tile indices:
@@ -102,11 +118,16 @@ function drawTiles(doc) {
 	].forEach((emoji) => {
 		ctx.fillText(emoji, getTileX() - 1, 14);
 	});
-	drawRockyTerrain(3, 4, 3); // 25
-	drawRockyTerrain(4, 3, 3); // 26
-	drawTerrain(3, 4, 2); // 27 -- Between 2 and 3
-	drawTerrain(3, 3, 3); // 28 -- Between 3 and 4
+	drawRockyTerrain(1, 1, 1); // 25
+	drawRockyTerrain(0, 0, 0); // 26
+	drawTerrain(0, 0, 0); // 27 -- Between 2 and 3
+	drawTerrain(0, 1, 0); // 28 -- Between 3 and 4
 	drawStoneWall(); // 29
+	drawTree(); // 30
+	drawTree(); // 31
+	drawTree(); // 32
+	drawTree(); // 33
+	drawTree(); // 34
 	// const x = getTileX();
 	// rect(3, 3, 3, x, 0);
 	// Tile incides 5, 6, 7, 8, 9

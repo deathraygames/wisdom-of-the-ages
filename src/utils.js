@@ -4,6 +4,7 @@ const getPseudoRand = (n) => {
 	return x - Math.floor(x);
 };
 
+/** things need to have a `pos` that's a `vec2` */
 function getNearest(things = [], targetPos = {}) {
 	let nearest;
 	const bestDistance = things.reduce((best, a) => { // eslint-disable-line no-unused-vars

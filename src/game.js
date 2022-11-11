@@ -1,5 +1,5 @@
 /* eslint-disable indent, max-len */
-import World from './world.js';
+
 import { loadTileImageSource } from './tiles.js';
 import { setupSounds } from './sounds.js';
 import { achievements, award } from './achievements.js';
@@ -7,12 +7,13 @@ import * as engine from './little-engine-esm/little-engine-esm-build.all.js';
 
 const {
 	vec2, clamp, FontImage, Color,
-	setCameraPos, setCameraScale, setGravity,
+	setCameraPos, setCameraScale,
 	keyWasReleased,
 	drawTextScreen, getOverlayCanvas, getCameraScale, getCameraPos,
 	screenToWorld, getMouseWheel, drawRectScreenSpace,
 	getTileCollisionSize,
 } = engine;
+
 setupSounds(engine);
 window.engine = engine;
 
@@ -26,82 +27,40 @@ let gameState = 0; // 0 = not begun, 1 = alive & running, 2 = dead, 3 = win
 const TILE_SIZE = 16; // was 24 for Bit Butcher
 win.TILE_SIZE = TILE_SIZE;
 const WIN_MEAT = 13;
-let w;
+let world;
 let font;
 
 // medals
 // const medal_example = new Medal(0, 'Example Medal', 'Medal description goes here.');
 // medalsInit('Hello World');
 
+function init(worldParam) {
+	world = worldParam;
+	win.w = world;
+	win.world = world;
+}
+
 // /////////////////////////////////////////////////////////////////////////////
 function gameInit() {
-	w = new World();
-	w.init();
-	win.w = w;
-	win.world = w;
 	font = new FontImage();
+	world.init();
 
 	// move camera to center of collision
 	setCameraPos(getTileCollisionSize().scale(.5));
 	setCameraScale(42);
-
-	// enable gravity
-	setGravity(0); // -.01;
-
-	// create particle emitter
-	// const emPos = vec2(10, 12);
-	// particleEmiter = new ParticleEmitter(
-	//     emPos, 0, 1, 0, 200, PI, // pos, angle, emitSize, emitTime, emitRate, emiteCone
-	//     0, vec2(TILE_SIZE),                            // tileIndex, tileSize
-	//     new Color(1,1,1),   new Color(0,0,0),   // colorStartA, colorStartB
-	//     new Color(1,1,1,0), new Color(0,0,0,0), // colorEndA, colorEndB
-	//     2, .2, .2, .1, .05,     // particleTime, sizeStart, sizeEnd, particleSpeed, particleAngleSpeed
-	//     .99, 1, .5, PI, .05,     // damping, angleDamping, gravityScale, particleCone, fadeRate,
-	//     .5, 1, 1                // randomness, collide, additive, randomColorLinear, renderOrder
-	// );
-	// particleEmiter.elasticity = .3; // bounce when it collides
-	// particleEmiter.trailScale = 2;  // stretch in direction of motion
-
-	// console.log(tileImage.src);
-	// mainContext.drawImage(tileImage, 1000, 1000);
-	// mainContext.fillStyle = 'green';
-	// mainContext.fillRect(0, 0, 100, 100);
-	// // tileImage = new Image();
-	// tileImage.src = mainCanvas.toDataURL();
-
-	// console.log(tileImage.src);
-	// mainContext.drawImage(tileImage, 1000, 1000);
-	// glInit();
-	// glTileTexture = glCreateTexture(tileImage);
 }
 
 // ////////////////////////////////////////////////////////////////////////////
 function gameUpdate() {
-	const { pc } = w;
+	const { pc } = world;
 	if (pc !== win.pc) win.pc = pc; // Just for easy debugging
-	// if (mouseWasPressed(0)) {
-		// award(0);
-		// if (pc) pc.damage(1, pc);
-		// play sound when mouse is pressed
-		// sounds.click.play(mousePos);
-
-		// change particle color and set to fade out
-		// particleEmiter.colorStartA = new Color;
-		// particleEmiter.colorStartB = randColor();
-		// particleEmiter.colorEndA = particleEmiter.colorStartA.scale(1,0);
-		// particleEmiter.colorEndB = particleEmiter.colorStartB.scale(1,0);
-
-		// unlock medals
-		// medal_example.unlock();
-		// console.log(mousePos);
-	// }
 
 	if (keyWasReleased(13)) {
 		if (gameState === 2 || gameState === 3) {
 			win.location.reload();
 		} else if (gameState === 0 || gameState === 2) {
 			gameState = 1;
-			w.makePc();
+			world.makePc();
 		}
 	}
 	if (pc) {
@@ -117,16 +76,9 @@ function gameUpdate() {
 		}
 	}
 
-	// move particles to mouse location if on screen
-	// if (mousePosScreen.x) {
-		// particleEmiter.pos = mousePos;
-		// pc.pos = mousePos;
-		// particleEmiter.pos = pc.pos;
-	// }as
-
 	setCameraScale(clamp(getCameraScale() * (1 - getMouseWheel() / 10), 3, 700));
 
-	if (w) w.update();
+	if (world) world.update();
 }
 
 // /////////////////////////////////////////////////////////////////////////////
@@ -179,7 +131,7 @@ function renderInventory(pc) {
 function gameRenderPost() {
 	const overlayCanvas = engine.getOverlayCanvas();
 	const cameraPos = engine.getCameraPos();
-	const { pc } = w;
+	const { pc } = world;
 	const d = drawTextScreen;
 	const white = new Color();
 	// draw to overlay canvas for hud rendering
@@ -228,8 +180,13 @@ function gameRenderPost() {
 
 // /////////////////////////////////////////////////////////////////////////////
 // Startup LittleJS Engine
-(async () => {
+async function startGame() {
 	engine.setTileSizeDefault(vec2(TILE_SIZE));
 	const tis = await loadTileImageSource();
 	engine.engineInit(gameInit, gameUpdate, gameUpdatePost, gameRender, gameRenderPost, tis);
-})();
+}
+
+export {
+	init,
+	startGame,
+};

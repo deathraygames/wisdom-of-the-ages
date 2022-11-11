@@ -102,6 +102,10 @@ class CharacterEntity extends WorldEntity {
 		this.setEmotion(this.emotionKey);
 	}
 
+	move(vector) {
+		this.moveInput = vector.copy();
+	}
+
 	damage(damage, damagingObject) {
 		const actualDmg = super.damage(damage, damagingObject);
 		if (actualDmg <= 0) return 0;
@@ -177,6 +181,10 @@ class CharacterEntity extends WorldEntity {
 		if (throwQuant) this.world.makeItem(item.name, this.pos, 3);
 		// TODO: Adjust the quantity of this new item to 1?
 		return throwQuant;
+	}
+
+	throwEquipped() {
+		return this.throw(this.equipIndex);
 	}
 
 	toggleEquip(invIndex) {

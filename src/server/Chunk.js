@@ -3,10 +3,11 @@ import {
 	vec2, randColor, randInt,
 	// engine
 	setRandSeed, randSeeded,
-} from './little-engine-esm/little-engine-esm-build.all.js';
-import { getPseudoRand } from './utils.js';
+} from '../little-engine-esm/little-engine-esm-build.all.js';
+import { getPseudoRand } from '../utils.js';
 
 const TERRAIN_TILE_LOOKUP = [1, 2, 27, 3, 28, 4]; //  25, 26];
+const TREE_TILES = [30, 31, 32, 33, 34];
 const MAX_CHUNK_DNA = 999;
 // const SEED = 1235;
 const SEED = randInt(9999);
@@ -96,9 +97,14 @@ class Chunk {
 		const terrainIndex = this.getNearestTerrain(pos);
 		let tileIndex = TERRAIN_TILE_LOOKUP[terrainIndex]; // preferred tile index based on location
 		const isRockyProne = tileIndex === 28;
-		const blocked = r > (isRockyProne ? .975 : .991);
+		let blocked = r > (isRockyProne ? .975 : .991);
 		const rock = blocked && (isRockyProne || pos.distance(this.center) > this.size.x / 3.5);
-		if (r < .1) tileIndex = 1;
+		if (r < .05) {
+			const treeIndex = this.getDnaInt(++i, 0, TREE_TILES.length);
+			tileIndex = TREE_TILES[treeIndex];
+			blocked = true;
+		}
+		else if (r < .1) tileIndex = 1;
 		else if (r < .2) tileIndex = tileIndex + this.getDnaInt(++i, -1, 1); // eslint-disable-line
 		else if (r < .4) tileIndex = this.getDnaInt(++i, 1, 5);
 		if (rock) tileIndex = 25 + this.getDnaInt(++i, 2);

@@ -1,10 +1,6 @@
-import {
-	vec2, PI,
-	getMousePos, mouseIsDown, keyWasPressed, keyIsDown,
-	gamepadIsDown, getUsingGamepad, gamepadStick,
-} from './little-engine-esm/little-engine-esm-build.all.js';
-import { award } from './achievements.js';
 import CharacterEntity from './CharacterEntity.js';
+
+const { vec2 } = CharacterEntity.getEngine();
 
 class PlayerCharacterEntity extends CharacterEntity {
 	constructor(entOptions) {
@@ -17,27 +13,8 @@ class PlayerCharacterEntity extends CharacterEntity {
 		this.oldAge = 100;
 	}
 
-	update() { // from platformer Player extends Character
-		const mousePos = getMousePos();
-		if (mouseIsDown(2)) this.goTo(mousePos, true); // right click movement
-
-		const numKeyCodes = [48, 49, 50, 51, 52, 53, 54, 55, 56, 57];
-		numKeyCodes.forEach((n) => { if (keyWasPressed(n)) this.toggleEquip(n - 48); });
-
-		// "Q" or "Z" key
-		if (keyIsDown(81) || keyIsDown(90) || gamepadIsDown(1)) this.throw(this.equipIndex);
-		// "E" or "X" key
-		if (keyIsDown(69) || keyIsDown(88) || mouseIsDown(0) || gamepadIsDown(0)) this.action(mousePos);
-
-		// movement control
-		this.moveInput = getUsingGamepad()
-			? gamepadStick(0) : vec2(keyIsDown(39) - keyIsDown(37), keyIsDown(38) - keyIsDown(40));
-
-		if (this.moveInput && (this.moveInput.x || this.moveInput.y)) {
-			award(0);
-		}
+	update() {
 		this.scary = true;
-
 		super.update();
 		this.updateEquip();
 	}
@@ -61,7 +38,7 @@ class PlayerCharacterEntity extends CharacterEntity {
 		else if (this.direction === 1) offset = vec2(.2, -.2);
 		else if (this.direction === 7) offset = vec2(-.2, -.1);
 		ee.localPos = ee.localPos.add(offset);
-		ee.localAngle = this.facing + (PI * 1.2) + (item.holdAngleOffset || 0);
+		ee.localAngle = this.facing + (Math.PI * 1.2) + (item.holdAngleOffset || 0);
 		ee.renderOrder = (ee.pos.y < this.pos.y) ? 11 : 9;
 	}
 }

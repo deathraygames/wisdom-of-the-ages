@@ -2,11 +2,11 @@ import {
 	vec2, PI, randInt, rand,
 	setGravity,
 	setCameraPos, initTileCollision, TileLayer, TileLayerData, setTileCollisionData,
-} from './little-engine-esm/little-engine-esm-build.all.js';
-import PlayerCharacterEntity from './PlayerCharacterEntity.js';
-import AnimalEntity from './AnimalEntity.js';
-import ItemEntity from './ItemEntity.js';
-import SpiritEntity from './SpiritEntity.js';
+} from '../little-engine-esm/little-engine-esm-build.all.js';
+import PlayerCharacterEntity from '../PlayerCharacterEntity.js';
+import AnimalEntity from '../AnimalEntity.js';
+import ItemEntity from '../ItemEntity.js';
+import SpiritEntity from '../SpiritEntity.js';
 import Chunk from './Chunk.js';
 
 const WORLD_SIZE = 200;

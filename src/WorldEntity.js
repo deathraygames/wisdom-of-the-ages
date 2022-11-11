@@ -1,8 +1,11 @@
 import {
-	Color, vec2, randInt, PI, max, percent, randColor,
 	ASSERT,
 	Timer, EngineObject, TileLayerData,
 } from './little-engine-esm/little-engine-esm-build.all.js';
+import * as engineTools from './engineTools.js';
+
+const { Color, vec2, randInt, max, percent, randColor } = engineTools;
+const { PI } = Math;
 
 /** A WorldEntity is a generic "thing" that exists in the world */
 class WorldEntity extends EngineObject {
@@ -30,6 +33,10 @@ class WorldEntity extends EngineObject {
 		// 3 = right-down, 4 = down, 5 = left-down, 6 = left, 7 = left-up
 		this.drawSize = vec2(1);
 		// this.tileIndex = 1;
+	}
+
+	static getEngine() {
+		return engineTools;
 	}
 
 	getTileData() {
