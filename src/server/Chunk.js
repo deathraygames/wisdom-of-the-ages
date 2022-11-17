@@ -5,6 +5,7 @@ import {
 	setRandSeed, randSeeded,
 } from '../little-engine-esm/little-engine-esm-build.all.js';
 import { getPseudoRand } from '../utils.js';
+import { ROCK_BLOCK_TYPE, TREE_BLOCK_TYPE } from '../constants.js';
 
 const TERRAIN_TILE_LOOKUP = [1, 2, 27, 3, 28, 4]; //  25, 26];
 const TREE_TILES = [30, 31, 32, 33, 34];
@@ -31,7 +32,7 @@ class Chunk {
 	generateDna() {
 		const dna = [];
 		setRandSeed(this.seed);
-		for (let i = 999; i--;) dna.push(randSeeded(0, 1));
+		for (let i = MAX_CHUNK_DNA; i--;) dna.push(randSeeded(0, 1));
 		return dna;
 	}
 
@@ -52,7 +53,10 @@ class Chunk {
 	}
 
 	generateTerrainTileCellArray() {
-		const arr = [{ pos: vec2(this.size.x / 2, this.size.y / 2), terrainIndex: 0, weight: 1 }];
+		const arr = [
+			// put a point right in the center
+			{ pos: vec2(this.size.x / 2, this.size.y / 2), terrainIndex: 0, weight: 1 },
+		];
 		for (let t = 200; t--;) {
 			const i = t * 4;
 			arr.push({
@@ -88,29 +92,50 @@ class Chunk {
 	}
 
 	getGround(pos) {
+		// If the position has a custom ground, then use that
 		const cg = this.customizedGround[Chunk.getKey(pos)];
 		// ^ TODO: combine custom + procedural together in case there are missing properties?
 		if (cg) return { ...cg };
+		// Otherwise let's figure out the ground procedurally
 		const posSeed = pos.x + pos.y * this.size.x;
 		let i = Math.round(getPseudoRand(posSeed) * MAX_CHUNK_DNA);
 		const r = this.getDnaValue(i);
 		const terrainIndex = this.getNearestTerrain(pos);
 		let tileIndex = TERRAIN_TILE_LOOKUP[terrainIndex]; // preferred tile index based on location
+		const underTileIndex = tileIndex;
 		const isRockyProne = tileIndex === 28;
-		let blocked = r > (isRockyProne ? .975 : .991);
+		let blocked = r > (isRockyProne ? .970 : .991);
 		const rock = blocked && (isRockyProne || pos.distance(this.center) > this.size.x / 3.5);
-		if (r < .05) {
+		const tree = blocked && !rock;
+		let blockType = null;
+		// if (r < .05) {
+		// 	const treeIndex = this.getDnaInt(++i, 0, TREE_TILES.length);
+		// 	tileIndex = TREE_TILES[treeIndex];
+		// 	blocked = true;
+		// } else 
+		// if (r < .1) tileIndex = 1;
+		// else 
+		if (r < .2) tileIndex = tileIndex + this.getDnaInt(++i, -1, 1); // eslint-disable-line
+		else if (r < .4) tileIndex = this.getDnaInt(++i, 1, 5);
+		if (rock) {
+			tileIndex = 25 + this.getDnaInt(++i, 2);
+			blockType = ROCK_BLOCK_TYPE;
+		} else if (tree) {
 			const treeIndex = this.getDnaInt(++i, 0, TREE_TILES.length);
 			tileIndex = TREE_TILES[treeIndex];
-			blocked = true;
+			blockType = TREE_BLOCK_TYPE;
 		}
-		else if (r < .1) tileIndex = 1;
-		else if (r < .2) tileIndex = tileIndex + this.getDnaInt(++i, -1, 1); // eslint-disable-line
-		else if (r < .4) tileIndex = this.getDnaInt(++i, 1, 5);
-		if (rock) tileIndex = 25 + this.getDnaInt(++i, 2);
 		// console.log('pos', pos.x, pos.y, tileIndex);
 		const color = blocked && !rock ? randColor() : undefined;
-		return { tileIndex, color, blocked };
+		return {
+			tileIndex,
+			underTileIndex, // what tile is underneath (e.g., if blocked)
+			color,
+			blocked,
+			blockType, // null if no block, or a block type constant
+			directions: 4, // TODO: Change for trees
+			mirrors: 2,
+		};
 	}
 
 	customizeGround(pos, ground = {}) {

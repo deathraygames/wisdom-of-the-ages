@@ -90,7 +90,7 @@ function drawTiles(doc) {
 	rect('f', 'f', 0, 12, 12, 12, 12);
 	drawTerrain(0, 0, 0); // 1
 	drawTerrain(1, 1, 1); // 2
-	drawTerrain(0, 1, 0); // 3
+	drawTerrain(0, 1, 0); // 3 -- trees
 	drawTerrain(1, 1, 0); // 4
 	ctx.fillStyle = '#fff';
 	ctx.font = '14px serif';
@@ -110,7 +110,7 @@ function drawTiles(doc) {
 		'🔨', // 17
 		'🕯️', // 18
 		'🧱', // 19
-		'', // 20
+		'🌳', // 20
 		'', // 21
 		'', // 22
 		'', // 23
@@ -121,7 +121,7 @@ function drawTiles(doc) {
 	drawRockyTerrain(1, 1, 1); // 25
 	drawRockyTerrain(0, 0, 0); // 26
 	drawTerrain(0, 0, 0); // 27 -- Between 2 and 3
-	drawTerrain(0, 1, 0); // 28 -- Between 3 and 4
+	drawTerrain(0, 1, 0); // 28 -- Between 3 and 4 -- rocky
 	drawStoneWall(); // 29
 	drawTree(); // 30
 	drawTree(); // 31

@@ -10,6 +10,7 @@ import { getSpecies, drawSpecies, breedSpecies } from './species.js';
 import WorldEntity from './WorldEntity.js';
 import ItemEntity from './ItemEntity.js';
 import { getNearest } from './utils.js';
+import { ROCK_BLOCK_TYPE, TREE_BLOCK_TYPE } from './constants.js';
 
 const nc = (...a) => new Color(...a);
 
@@ -280,7 +281,7 @@ class CharacterEntity extends WorldEntity {
 		}
 		playSound('attack');
 		if (!isBuilding) w.makeItem('Stone', where, 1);
-		w.setGroundTileFromWorld(
+		w.setGroundFromWorld(
 			where,
 			// ground:
 			(isBuilding) ? { tileIndex: 29, blocked: true } : { tileIndex: 4, blocked: false },
@@ -291,12 +292,25 @@ class CharacterEntity extends WorldEntity {
 		const w = this.world;
 		const where = this.getActionTilePos();
 		const currentGround = w.getGroundFromWorld(where);
-		const isRock = (currentGround.tileIndex === 25 || currentGround.tileIndex === 26);
+		const isRock = currentGround.blockType === ROCK_BLOCK_TYPE; // (currentGround.tileIndex === 25 || currentGround.tileIndex === 26);
 		// if (!isRock) { playSound('dud'); return; }
 		playSound('attack');
 		if (isRock) w.makeItem('Stone', where, 2, randInt(1, 3));
 		const ground = { tileIndex: 4, blocked: false };
-		w.setGroundTileFromWorld(where, ground);
+		w.setGroundFromWorld(where, ground);
+	}
+
+	chop() {
+		const w = this.world;
+		const where = this.getActionTilePos();
+		const currentGround = w.getGroundFromWorld(where);
+		const isTree = currentGround.blockType === TREE_BLOCK_TYPE; // (currentGround.tileIndex >= 30 && currentGround.tileIndex <= 34);
+		if (!isTree) { playSound('dud'); return; }
+		playSound('attack');
+		// TODO: Do an attack and put custom ground down
+		w.makeItem('Wood', where, 2, randInt(1, 3));
+		const ground = { tileIndex: 4, blocked: false };
+		w.setGroundFromWorld(where, ground);
 	}
 
 	consume(item, quiet) { // mutates item
@@ -340,6 +354,7 @@ class CharacterEntity extends WorldEntity {
 		if (item.name === 'Meat') this.craft('meal');
 		if (item.build) this.build();
 		else if (item.dig) this.dig();
+		else if (item.chop) this.chop();
 		else if (item.consumable) this.consume(item);
 	}
 
@@ -423,7 +438,7 @@ class CharacterEntity extends WorldEntity {
 		// @ 6 sec/year --> 10 minutes IRL = 600 sec IRL = 100 years
 		// @ 3 sec/year --> 5 minutes IRL = 100 years
 		this.agingTimer.set(4);
-		this.age += 1;
+		this.age += 0; // 1; // Aging is currently disabled
 		if (this.isOld()) this.damage(1, this);
 		return true;
 	}

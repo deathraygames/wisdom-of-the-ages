@@ -38,6 +38,7 @@ function init(worldParam) {
 	world = worldParam;
 	win.w = world;
 	win.world = world;
+	win.engine = engine;
 }
 
 // /////////////////////////////////////////////////////////////////////////////
@@ -166,11 +167,12 @@ function gameRenderPost() {
 			);
 		});
 
-		const gb = (pc.age > 85) ? 0 : 1;
-		const c = new Color(1, gb, gb, .8);
-		const width = 500 * (Math.max(0, 100 - pc.age) / 100);
-		drawRectScreenSpace(vec2(midX, 40), vec2(width, 2), c);
-		d(`Age: ${Math.ceil(pc.age)}`, vec2(midX, 40), 20, c, 4);
+		// const gb = (pc.age > 85) ? 0 : 1;
+		// const c = new Color(1, gb, gb, .8);
+		// const width = 500 * (Math.max(0, 100 - pc.age) / 100);
+		// drawRectScreenSpace(vec2(midX, 40), vec2(width, 2), c);
+		// d(`Age: ${Math.ceil(pc.age)}`, vec2(midX, 40), 20, c, 4);
+
 		if (gameState === 3) {
 			font.drawText('YOU WIN', cameraPos.add(vec2(0, 5)), .2, 1);
 			d('Press Enter to play again', vec2(midX, midY - 80), 40, white, 4);

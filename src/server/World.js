@@ -8,6 +8,7 @@ import AnimalEntity from '../AnimalEntity.js';
 import ItemEntity from '../ItemEntity.js';
 import SpiritEntity from '../SpiritEntity.js';
 import Chunk from './Chunk.js';
+import itemTypes from '../itemTypes.js';
 
 const WORLD_SIZE = 200;
 
@@ -19,17 +20,6 @@ class World {
 		this.items = [];
 		this.animals = [];
 		this.spirits = [];
-		this.itemTypes = [
-			{ name: 'Meat', tileIndex: 7, quantity: 1, stack: 64, emoji: '🍖' },
-			{ name: 'Blood', tileIndex: 6, quantity: 1, stack: 64, emoji: '🩸' },
-			{ name: 'Butcher knife', type: 'w', tileIndex: 5, quantity: 1, stack: 8, damaging: 1, lunge: 1, emoji: '🔪' },
-			{ name: 'Herb', tileIndex: 8, quantity: 1, stack: 64, bait: 1, emoji: '🌿', angleOffset: -.6, holdAngleOffset: PI / 2 },
-			{ name: 'Blood wine', tileIndex: 13, quantity: 1, stack: 64, youth: 10, consumable: 1, emoji: '🍷' },
-			{ name: 'Meal', tileIndex: 14, quantity: 1, stack: 8, youth: 1, consumable: 1, emoji: '🍲' },
-			{ name: 'Hammer', tileIndex: 17, quantity: 1, stack: 8, build: 1, weight: .5, reticle: 1, emoji: '🔨', holdAngleOffset: PI },
-			{ name: 'Pickaxe', tileIndex: 15, quantity: 1, stack: 8, dig: 1, weight: .5, reticle: 1, emoji: '⛏️', holdAngleOffset: PI },
-			{ name: 'Stone', tileIndex: 19, quantity: 1, stack: 64, emoji: '🧱' },
-		];
 		this.tiles = [];
 		this.chunkPos = vec2();
 		this.chunks = {};
@@ -43,8 +33,8 @@ class World {
 		return this.pc;
 	}
 
-	getItemType(name) {
-		return this.itemTypes.find((i) => i.name === name);
+	getItemType(name) { // eslint-disable-line
+		return itemTypes.find((i) => i.name === name);
 	}
 
 	getRandPos() {
@@ -104,23 +94,34 @@ class World {
 		return this.getChunk().getGround(this.worldPosToTilePos(worldPos));
 	}
 
-	setGroundTileFromWorld(worldPos, ground) {
+	setGround(tilePos, ground = {}) {
+		this.getChunk().customizeGround(tilePos, ground);
+		this.setGroundTile(tilePos, ground, true);
+	}
+
+	setGroundFromWorld(worldPos, ground) {
 		const tilePos = this.worldPosToTilePos(worldPos);
 		this.groundTileLayer.redrawStart();
-		this.setGroundTile(tilePos, ground, true);
+		this.setGround(tilePos, ground);
 		this.groundTileLayer.redrawEnd();
 	}
 
 	setGroundTile(tilePos, ground = {}, redraw = false) {
-		const { tileIndex, color, blocked } = ground;
-		this.getChunk().customizeGround(tilePos, ground);
+		const {
+			tileIndex,
+			color,
+			blocked = false,
+			directions = 4,
+			mirrors = 2,
+		} = ground;
+		// this.getChunk().customizeGround(tilePos, ground);
 		// console.log(arguments, worldPos, tilePos, this.getChunk());
 		if (blocked) setTileCollisionData(tilePos, 1);
 		else if (redraw) setTileCollisionData(tilePos, 0);
 		const data = new TileLayerData(
 			tileIndex,
-			randInt(4), // direction
-			randInt(2), // mirror
+			randInt(directions), // direction 0-3
+			randInt(mirrors), // mirror 0-1
 			color,
 		);
 		this.groundTileLayer.setData(tilePos, data, redraw);
@@ -143,6 +144,7 @@ class World {
 
 		const getNear = (n) => this.center.add(vec2().setAngle(rand(2 * PI), n));
 		this.makeItem('Butcher knife', getNear(9));
+		this.makeItem('Axe', getNear(12));
 		this.makeItem('Pickaxe', getNear(34));
 		this.makeItem('Hammer', getNear(35));
 		[20, 21, WORLD_SIZE / 2, rand(20, WORLD_SIZE / 2)].forEach((n) => {

@@ -7,6 +7,7 @@ class WulfServer {
 		this.isWulfServer = true;
 		this.game = game;
 		this.world = new World();
+		this.comm = null;
 		game.init(this.world);
 		game.startGame();
 	}

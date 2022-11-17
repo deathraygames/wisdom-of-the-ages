@@ -12,8 +12,9 @@ const comm = new Communicator({ server });
 
 let lastMoveInput = false;
 
-const loop = new AnimationLoop((/* lastTimeDeltaMs, t, nowTime, tick */) => {
-	// console.log(lastTimeDeltaMs, t, nowTime, tick);
+const uiState = 'play';
+
+function handlePlayInputs() {
 	const mousePos = getMousePos();
 	if (mouseIsDown(2)) comm.send('pc', 'goTo', mousePos, true); // right click movement
 
@@ -40,5 +41,10 @@ const loop = new AnimationLoop((/* lastTimeDeltaMs, t, nowTime, tick */) => {
 	if (moveInput && (moveInput.x || moveInput.y)) {
 		comm.send('game', 'award', 0);
 	}
+}
+
+const loop = new AnimationLoop((/* lastTimeDeltaMs, t, nowTime, tick */) => {
+	// console.log(lastTimeDeltaMs, t, nowTime, tick);
+	if (uiState === 'play') handlePlayInputs();
 });
 loop.start();

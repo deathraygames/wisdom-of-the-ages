@@ -1,6 +1,9 @@
 class Communicator {
-	constructor({ server } = {}) {
+	constructor({ server, client } = {}) {
 		this.server = server;
+		this.client = client;
+		// if (server) this.server.comm = new Communicator();
+		// if (client) this.client.comm = new Communicator();
 	}
 
 	send(...args) {
