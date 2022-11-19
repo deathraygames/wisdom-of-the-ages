@@ -1,4 +1,4 @@
-class Communicator {
+class ServerCommunicator {
 	constructor({ server, client } = {}) {
 		this.server = server;
 		this.client = client;
@@ -24,4 +24,4 @@ class Communicator {
 	}
 }
 
-export default Communicator;
+export default ServerCommunicator;

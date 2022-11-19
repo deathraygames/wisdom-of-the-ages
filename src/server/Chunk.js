@@ -108,6 +108,7 @@ class Chunk {
 		const rock = blocked && (isRockyProne || pos.distance(this.center) > this.size.x / 3.5);
 		const tree = blocked && !rock;
 		let blockType = null;
+		let blockHealth = 0;
 		// if (r < .05) {
 		// 	const treeIndex = this.getDnaInt(++i, 0, TREE_TILES.length);
 		// 	tileIndex = TREE_TILES[treeIndex];
@@ -120,10 +121,12 @@ class Chunk {
 		if (rock) {
 			tileIndex = 25 + this.getDnaInt(++i, 2);
 			blockType = ROCK_BLOCK_TYPE;
+			blockHealth = 5;
 		} else if (tree) {
 			const treeIndex = this.getDnaInt(++i, 0, TREE_TILES.length);
 			tileIndex = TREE_TILES[treeIndex];
 			blockType = TREE_BLOCK_TYPE;
+			blockHealth = 5;
 		}
 		// console.log('pos', pos.x, pos.y, tileIndex);
 		const color = blocked && !rock ? randColor() : undefined;
@@ -133,6 +136,7 @@ class Chunk {
 			color,
 			blocked,
 			blockType, // null if no block, or a block type constant
+			blockHealth,
 			directions: 4, // TODO: Change for trees
 			mirrors: 2,
 		};

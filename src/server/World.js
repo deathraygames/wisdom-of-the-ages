@@ -9,8 +9,11 @@ import ItemEntity from '../ItemEntity.js';
 import SpiritEntity from '../SpiritEntity.js';
 import Chunk from './Chunk.js';
 import itemTypes from '../itemTypes.js';
+import { playSound } from '../sounds.js';
+import { ROCK_BLOCK_TYPE, TREE_BLOCK_TYPE } from '../constants.js';
 
 const WORLD_SIZE = 200;
+const NOOP = () => {};
 
 class World {
 	constructor() {
@@ -25,6 +28,7 @@ class World {
 		this.chunks = {};
 		this.pc = 0;
 		this.groundTileLayer = null;
+		this.broadcast = NOOP;
 	}
 
 	makePc(pos = this.center.copy()) {
@@ -125,6 +129,43 @@ class World {
 			color,
 		);
 		this.groundTileLayer.setData(tilePos, data, redraw);
+	}
+
+	action(what, where, amount = 0, who) {
+		const currentGround = this.getGroundFromWorld(where);
+		if (what === 'chop') {
+			const isTree = currentGround.blockType === TREE_BLOCK_TYPE;
+			if (!isTree) { playSound('dud'); return; }
+			playSound('attack');
+			const blockHealth = currentGround.blockHealth - amount;
+			if (blockHealth > 0) {
+				this.broadcast('block hit', blockHealth);
+				const updatedGround = { ...currentGround, blockHealth };
+				this.setGroundFromWorld(where, updatedGround);
+				return;
+			}
+			this.broadcast('block destroyed');
+			// Block was destroyed
+			this.makeItem('Wood', where, 2, randInt(1, 3));
+			const ground = { tileIndex: currentGround.underTileIndex, blocked: false };
+			this.setGroundFromWorld(where, ground);
+		} else if (what === 'pick') {
+			const isRock = currentGround.blockType === ROCK_BLOCK_TYPE;
+			if (!isRock) { playSound('dud'); return; }
+			playSound('attack');
+			const blockHealth = currentGround.blockHealth - amount;
+			if (blockHealth > 0) {
+				this.broadcast('block hit', blockHealth);
+				const updatedGround = { ...currentGround, blockHealth };
+				this.setGroundFromWorld(where, updatedGround);
+				return;
+			}
+			this.broadcast('block destroyed');
+			// Block was destroyed
+			this.makeItem('Stone', where, 2, randInt(1, 3));
+			const ground = { tileIndex: currentGround.underTileIndex, blocked: false };
+			this.setGroundFromWorld(where, ground);
+		}
 	}
 
 	init() {

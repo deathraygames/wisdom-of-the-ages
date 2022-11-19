@@ -10,7 +10,6 @@ import { getSpecies, drawSpecies, breedSpecies } from './species.js';
 import WorldEntity from './WorldEntity.js';
 import ItemEntity from './ItemEntity.js';
 import { getNearest } from './utils.js';
-import { ROCK_BLOCK_TYPE, TREE_BLOCK_TYPE } from './constants.js';
 
 const nc = (...a) => new Color(...a);
 
@@ -288,29 +287,16 @@ class CharacterEntity extends WorldEntity {
 		);
 	}
 
-	dig() {
-		const w = this.world;
+	mine() {
 		const where = this.getActionTilePos();
-		const currentGround = w.getGroundFromWorld(where);
-		const isRock = currentGround.blockType === ROCK_BLOCK_TYPE; // (currentGround.tileIndex === 25 || currentGround.tileIndex === 26);
-		// if (!isRock) { playSound('dud'); return; }
-		playSound('attack');
-		if (isRock) w.makeItem('Stone', where, 2, randInt(1, 3));
-		const ground = { tileIndex: 4, blocked: false };
-		w.setGroundFromWorld(where, ground);
+		// TODO: get mining power of equipped item
+		this.world.action('mine', where, 1, this);
 	}
 
 	chop() {
-		const w = this.world;
 		const where = this.getActionTilePos();
-		const currentGround = w.getGroundFromWorld(where);
-		const isTree = currentGround.blockType === TREE_BLOCK_TYPE; // (currentGround.tileIndex >= 30 && currentGround.tileIndex <= 34);
-		if (!isTree) { playSound('dud'); return; }
-		playSound('attack');
-		// TODO: Do an attack and put custom ground down
-		w.makeItem('Wood', where, 2, randInt(1, 3));
-		const ground = { tileIndex: 4, blocked: false };
-		w.setGroundFromWorld(where, ground);
+		// TODO: get choping power of equipped item
+		this.world.action('chop', where, 1, this);
 	}
 
 	consume(item, quiet) { // mutates item
@@ -353,7 +339,7 @@ class CharacterEntity extends WorldEntity {
 		if (item.name === 'Blood') this.craft('wine');
 		if (item.name === 'Meat') this.craft('meal');
 		if (item.build) this.build();
-		else if (item.dig) this.dig();
+		else if (item.mine) this.mine();
 		else if (item.chop) this.chop();
 		else if (item.consumable) this.consume(item);
 	}
